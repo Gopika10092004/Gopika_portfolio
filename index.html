@@ -692,7 +692,14 @@
             <div class="contact-links">
                 <a href="https://github.com/Gopika10092004">🐙 GitHub</a>
                 <a href="https://www.linkedin.com/in/rgopika/">💼 LinkedIn</a>
-               <a href="mailto:rgopika1009@gmail.com">✉️ Email</a>
+              <a href="#" onclick="
+  if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+    window.location.href='mailto:rgopika1009@gmail.com';
+  } else {
+    window.open('https://mail.google.com/mail/u/0/?fs=1&to=rgopika1009@gmail.com&tf=cm','_blank');
+  }
+  return false;
+">✉️ Email</a>
                   
             
             </div>
