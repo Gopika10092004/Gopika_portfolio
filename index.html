@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gopika R | Portfolio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg-color: #050510;
+            --text-color: #e0e0ff;
+            --accent-1: #00f0ff;
+            /* Cyan */
+            --accent-2: #bc13fe;
+            /* Purple */
+            --card-bg: rgba(20, 20, 40, 0.4);
+            --card-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Starfield Background */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes float-slow {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-25px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), 0 0 30px rgba(188, 19, 254, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), 0 0 50px rgba(188, 19, 254, 0.5);
+            }
+
+            100% {
+                box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), 0 0 30px rgba(188, 19, 254, 0.2);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3 {
+            background: linear-gradient(45deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        /* Layout */
+        header {
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 5, 16, 0.6);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+            header {
+                backdrop-filter: blur(20px);
+            }
+        }
+
+        .logo {
+            .logo {
+                background: linear-gradient(45deg, var(--accent-1), var(--accent-2));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                animation: glowText 2s ease-in-out infinite alternate;
+            }
+        }
+
+        @keyframes glowText {
+            from {
+                text-shadow: 0 0 5px var(--accent-1);
+            }
+
+            to {
+                text-shadow: 0 0 15px var(--accent-1),
+                    0 0 25px var(--accent-2);
+            }
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent-1);
+            text-shadow: 0 0 10px var(--accent-1);
+        }
+
+        section {
+            min-height: 100vh;
+            padding: 120px 10% 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+                inset 0 0 15px rgba(255, 255, 255, 0.03);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
+            will-change: transform;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7),
+                0 0 30px rgba(0, 240, 255, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Floating classes */
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .float-delay-1 {
+            animation: float 7s ease-in-out infinite 1.5s;
+        }
+
+        .float-delay-2 {
+            animation: float 8s ease-in-out infinite 3s;
+        }
+
+        .float-slow {
+            animation: float-slow 10s ease-in-out infinite;
+        }
+
+        /* Specific Sections */
+        .hero {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            color: #b0b0ff;
+            font-weight: 300;
+        }
+
+        .avatar-container {
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 240, 255, 0.05), rgba(188, 19, 254, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 80px rgba(188, 19, 254, 0.2);
+            animation: float-slow 8s ease-in-out infinite;
+        }
+
+        .avatar {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--accent-1);
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.3);
+            backdrop-filter: blur(5px);
+            font-weight: 800;
+            letter-spacing: 5px;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            border-radius: 50%;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            text-decoration: none;
+            border: 1px solid var(--accent-1);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-right: 20px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, var(--accent-1), var(--accent-2));
+            border-color: transparent;
+            box-shadow: 0 0 25px rgba(188, 19, 254, 0.5);
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+        /* Grid Layouts for Sections */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Timeline/Experience */
+        .timeline-card {
+            position: relative;
+            padding-left: 25px;
+            border-left: 2px solid rgba(188, 19, 254, 0.5);
+        }
+
+        .timeline-card::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-1);
+            box-shadow: 0 0 15px var(--accent-1);
+        }
+
+        .date {
+            font-size: 1rem;
+            color: var(--accent-1);
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Skills */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .skill-bubble {
+            padding: 15px 35px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-weight: 600;
+            font-size: 1.1rem;
+            backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: float 5s ease-in-out infinite;
+            cursor: default;
+
+        }
+
+        .skill-bubble:nth-child(even) {
+            animation: float-delay-1 6s ease-in-out infinite;
+            border-color: rgba(0, 240, 255, 0.15);
+        }
+
+        .skill-bubble:nth-child(3n) {
+            animation: float-delay-2 7s ease-in-out infinite;
+            border-color: rgba(188, 19, 254, 0.15);
+        }
+
+        .skill-bubble:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.15) translateY(-10px) !important;
+            box-shadow: 0 10px 25px rgba(0, 240, 255, 0.3);
+            border-color: var(--accent-1);
+            color: #fff;
+        }
+
+        /* Contact */
+        .contact-wrap {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .contact-links a {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-decoration: none;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .contact-links a:hover {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border-color: transparent;
+            box-shadow: 0 10px 25px rgba(188, 19, 254, 0.5);
+            transform: translateY(-10px) scale(1.1);
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 990px) {
+            .hero {
+                flex-direction: column-reverse;
+                text-align: center;
+                padding-top: 150px;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .avatar-container {
+                width: 300px;
+                height: 300px;
+                margin-bottom: 50px;
+            }
+
+            .avatar {
+                width: 250px;
+                height: 250px;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+
+            .hero p {
+                font-size: 1.4rem;
+            }
+
+            nav {
+                display: none;
+                /* In a full app, we'd add a hamburger menu */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas-bg"></canvas>
+
+    <header>
+        <div class="logo">💻 Crafting Digital Experiences with Code ✨</div>
+        <nav>
+            <a href="#about">About</a>
+            <a href="#experience">Experience</a>
+            <a href="#projects">Projects</a>
+            <a href="#skills">Skills</a>
+            <a href="#education">Education</a>
+            <a href="#certificates">Certificates</a>
+            <a href="#achievements">Achievements</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content fade-in">
+            <h1>Gopika R</h1>
+            <p style="margin-bottom: 15px;">Aspiring Full Stack Developer</p>
+            <p
+                style="font-size: 1.15rem; color: #a0a0d0; font-weight: 300; max-width: 550px; margin-bottom: 40px; line-height: 1.8; letter-spacing: 0.5px;">
+                I'm a Computer Science Engineering student from Chennai, India, passionate about building beautiful,
+                responsive, and functional web experiences. Welcome to my gravity-defying digital world.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start;">
+                <a href="#projects" class="btn">View Projects</a>
+                <a href="GOPika%20_resumae.pdf" download class="btn"
+                    style="border-color: #00ffcc; box-shadow: 0 0 15px rgba(0,255,200,0.2);">
+                    ⬇ Download Resume
+                </a>
+
+                <a href="#contact" class="btn"
+                    style="border-color: var(--accent-2); box-shadow: 0 0 15px rgba(188,19,254,0.1);">Contact Me</a>
+            </div>
+        </div>
+        <div class="avatar-container fade-in">
+            <div class="avatar">
+                <img src="image/gopika.jpg" alt="Gopika">
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2>About Me</h2>
+        <div class="glass-card float fade-in" style="max-width: 850px; margin: 0 auto; text-align: center;">
+            <p style="font-size: 1.25rem; line-height: 1.9; font-weight: 300;">
+                I am a dedicated <span style="color: var(--accent-1); font-weight:600;">Computer Science
+                    Engineering</span> student (Class of 2026) based in Chennai, India.
+                Passionate about weaving code into functional and aesthetic applications, I specialize in full-stack
+                development. Currently exploring modern web technologies, machine learning, and writing scalable logic.
+                I believe in building digital experiences that feel somewhat magical—much like the space around us.
+            </p>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience">
+        <h2>Experience</h2>
+        <div class="grid-2">
+            <div class="glass-card float-delay-1 fade-in">
+                <div class="timeline-card">
+                    <div class="date">Recent Internship</div>
+                    <h3>VBind Innovations</h3>
+                    <h4 style="color: #b0b0ff; margin-bottom: 20px; font-weight: 400;">Full Stack Internship</h4>
+                    <p style="font-weight: 300;">Contributed to developing and maintaining comprehensive web
+                        applications. Worked across both client-side interfaces and server-side logic, enhancing user
+                        experience and system efficiency.</p>
+                </div>
+            </div>
+            <div class="glass-card float-delay-2 fade-in">
+                <div class="timeline-card">
+                    <div class="date">Inplant Training</div>
+                    <h3>BSNL</h3>
+                    <h4 style="color: #b0b0ff; margin-bottom: 20px; font-weight: 400;">Telecommunications Training</h4>
+                    <p style="font-weight: 300;">Gained hands-on exposure to networking principles and telecommunication
+                        infrastructure. Understood the underlying architecture of modern communication systems.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <h2>Featured Projects</h2>
+        <div class="grid-2">
+            <div class="glass-card float fade-in">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">💊</div>
+                <h3>Medicine Recommendation System</h3>
+                <p
+                    style="color: var(--accent-1); margin-bottom: 20px; font-weight: 600; font-size: 0.9rem; letter-spacing: 1px;">
+                    PYTHON • FLASK • ML</p>
+                <p style="font-weight: 300;">An intelligent system designed to recommend medicines based on user
+                    symptoms. Implemented machine learning models using Scikit-Learn to process inputs and provide
+                    accurate suggestions, served through a seamless Flask backend.</p>
+            </div>
+            <div class="glass-card float-delay-1 fade-in">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">✍️</div>
+                <h3>Dynamic Blog Website</h3>
+                <p
+                    style="color: var(--accent-2); margin-bottom: 20px; font-weight: 600; font-size: 0.9rem; letter-spacing: 1px;">
+                    PHP • MYSQL • BOOTSTRAP</p>
+                <p style="font-weight: 300;">A fully functional content management platform. Features include secure
+                    user authentication, CRUD operations for blog posts, and a responsive frontend powered by Bootstrap.
+                    Data structurally managed using MySQL.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <h2>Technical Arsenal</h2>
+        <div class="skills-container fade-in">
+            <div class="skill-bubble">💻 Java</div>
+            <div class="skill-bubble">🐍 Python</div>
+            <div class="skill-bubble">🧠 C/C++</div>
+            <div class="skill-bubble">🌐 HTML5</div>
+            <div class="skill-bubble">🎨 CSS3</div>
+            <div class="skill-bubble">⚡ JavaScript</div>
+            <div class="skill-bubble">🧩 PHP</div>
+            <div class="skill-bubble">🗄️ MySQL</div>
+            <div class="skill-bubble">🔥 Flask</div>
+            <div class="skill-bubble">🤖 Scikit-learn</div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education">
+        <h2>Education</h2>
+        <div class="grid-3">
+            <div class="glass-card float fade-in">
+                <h3>B.E Computer Science</h3>
+                <p style="color: var(--accent-1); margin-top: 15px; font-weight: 600;">Velammal Engineering College</p>
+                <p style="margin-top: 5px; font-size: 0.9rem; color: #b0b0ff;">2022-2026</p>
+                <div
+                    style="margin-top: 25px; display: inline-block; padding: 8px 15px; background: rgba(188,19,254,0.1); border-radius: 20px; border: 1px solid rgba(188,19,254,0.3);">
+                    <span style="color: #fff; font-weight: 600;">CGPA: 7.48</span>
+                </div>
+            </div>
+            <div class="glass-card float-delay-1 fade-in">
+                <h3>Higher Secondary (HSC)</h3>
+                <p style="color: var(--accent-1); margin-top: 15px; font-weight: 600;">Government Higher Secondary School
+                </p>
+                 <p style="margin-top: 5px; font-size: 0.9rem; color: #b0b0ff;">2020-2021</p>
+                <div
+                    style="margin-top: 32px; display: inline-block; padding: 8px 15px; background: rgba(0,240,255,0.1); border-radius: 20px; border: 1px solid rgba(0,240,255,0.3);">
+                    <span style="color: #fff; font-weight: 600;">Score: 87.33%</span>
+                </div>
+            </div>
+            <div class="glass-card float-delay-2 fade-in">
+                <h3>Secondary (SSLC)</h3>
+                <p style="color: var(--accent-1); margin-top: 15px; font-weight: 600;">Government Higher Secondary School</p>
+                <p style="margin-top: 5px; font-size: 0.9rem; color: #b0b0ff;">2018-2019</p>
+                <div
+                    style="margin-top: 32px; display: inline-block; padding: 8px 15px; background: rgba(188,19,254,0.1); border-radius: 20px; border: 1px solid rgba(188,19,254,0.3);">
+                    <span style="color: #fff; font-weight: 600;">Score: 77.40%</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certificates Section -->
+    <section id="certificates">
+        <h2>Certificates</h2>
+        <div class="grid-2">
+            <div class="glass-card float fade-in" style="display: flex; align-items: flex-start; gap: 25px;">
+                <div style="font-size: 3.5rem; line-height: 1; text-shadow: 0 0 20px var(--accent-1);">📜</div>
+                <div>
+                    <h3 style="margin-bottom: 10px;">VBind Innovations Internship</h3>
+                    <p style="font-weight: 300;">Successfully completed a Full Stack Internship at VBind Innovation Pvt Ltd, gaining practical industry experience.</p>
+                </div>
+            </div>
+            <div class="glass-card float-delay-1 fade-in" style="display: flex; align-items: flex-start; gap: 25px;">
+                <div style="font-size: 3.5rem; line-height: 1; text-shadow: 0 0 20px var(--accent-2);">💻</div>
+                <div>
+                    <h3 style="margin-bottom: 10px;">30 HTML, CSS & JS Projects</h3>
+                    <p style="font-weight: 300;">Completed an extensive beginner's course, successfully building 30 practical and responsive web projects.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements">
+        <h2>Achievements & Extras</h2>
+        <div class="grid-2">
+            <div class="glass-card float-delay-2 fade-in" style="display: flex; align-items: flex-start; gap: 25px;">
+                <div style="font-size: 3.5rem; line-height: 1; text-shadow: 0 0 20px var(--accent-1);">🏆</div>
+                <div>
+                    <h3 style="margin-bottom: 10px;">1st Prize at INNOVATEXPO</h3>
+                    <p style="font-weight: 300;">Recognized for innovative technical presentation and project
+                        demonstration, showcasing problem-solving and presentation skills.</p>
+                </div>
+            </div>
+            <div class="glass-card float-delay-1 fade-in" style="display: flex; align-items: flex-start; gap: 25px;">
+                <div style="font-size: 3.5rem; line-height: 1; text-shadow: 0 0 20px var(--accent-2);">🤝</div>
+                <div>
+                    <h3 style="margin-bottom: 10px;">NSS Volunteer</h3>
+                    <p style="font-weight: 300;">Actively engaged in community service and social impact initiatives,
+                        demonstrating leadership and commitment to society.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="glass-card contact-wrap float-slow fade-in"
+            style="animation: glow 4s infinite, float-slow 10s ease-in-out infinite;">
+            <h2>Let's Connect</h2>
+            <p style="font-size: 1.2rem; font-weight: 300;">Currently open to new opportunities, collaborations, and
+                exciting projects.</p>
+
+            <div style="margin-top: 40px;">
+                <h3 style="font-size: 1.8rem; margin-bottom: 5px;">rgopika1009@gmail.com</h3>
+                <p style="color: var(--accent-1); font-size: 1.2rem;">+91 6369753205</p>
+            </div>
+
+            <div class="contact-links">
+                <a href="https://github.com/Gopika10092004">🐙 GitHub</a>
+                <a href="https://www.linkedin.com/in/rgopika/">💼 LinkedIn</a>
+                <a href="https://mail.google.com/mail/u/0/?fs=1&to=rgopika1009@gmail.com&tf=cm" target="_blank">✉️
+                    Email</a>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Particle Background System
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * 0.4 - 0.2;
+
+                // Color selection
+                const colors = [
+                    'rgba(0, 240, 255, ', // Cyan
+                    'rgba(188, 19, 254, ', // Purple
+                    'rgba(255, 255, 255, ' // White/stars
+                ];
+
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                this.alpha = Math.random() * 0.5 + 0.1;
+                this.color = randomColor + this.alpha + ')';
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Wrap around edges
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Add soft glow to larger particles
+                if (this.size > 1.5) {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numParticles = Math.floor((canvas.width * canvas.height) / 8000);
+            for (let i = 0; i < numParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        // Intersection Observer for Scroll Fade-ins
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Stop observing once animated in
+                    // observer.unobserve(entry.target); 
+                } else {
+                    // Optional: remove visible class if you want them to animate out when scrolling up
+                    // entry.target.classList.remove('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(element => {
+            observer.observe(element);
+        });
+    </script>
+</body>
+
+</html>
